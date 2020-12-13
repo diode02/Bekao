@@ -1,22 +1,29 @@
-import React, { useState, Component } from "react";
+import React, { useState, Component, useEffect } from "react";
 import { Alert, Button, TextInput, View, StyleSheet } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function LoginScreen(props) {
+  const [email, setEmail] = useState("waqaskhanws12@gmail.com");
+  const [password, setPassword] = useState("khankhan");
+  const [isLogin, setIsLogin] = useState(null);
+  useEffect(() => {
+    if (isLogin) {
+      props.navigation.navigate("Home");
+    }
+  });
 
   const onLogin = async (event) => {
     // event.preventDefault();
     try {
       axios
-        .post("http://10.135.89.41:8080/users/login", {
+        .post("http://localhost:5000/users/login", {
           email,
           password,
         })
         .then(
           async (response) => {
             await AsyncStorage.setItem("@storage_Key", response.data);
+            setIsLogin(await AsyncStorage.getItem("@storage_Key"));
           },
           (error) => {
             console.log(error);
@@ -30,16 +37,16 @@ export default function LoginScreen() {
     }
   };
 
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem("@storage_Key");
-      if (value !== null) {
-        console.log(value);
-      }
-    } catch (e) {
-      // error reading value
-    }
-  };
+  // const getData = async () => {
+  //   try {
+  //     const value = await AsyncStorage.getItem("@storage_Key");
+  //     if (value !== null) {
+  //       console.log(value);
+  //     }
+  //   } catch (e) {
+  //     // error reading value
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -58,7 +65,7 @@ export default function LoginScreen() {
       />
 
       <Button title={"Login"} style={styles.input} onPress={onLogin} />
-      <Button title={"Read"} style={styles.input} onPress={getData} />
+      {/* <Button title={"Read"} style={styles.input} onPress={getData} /> */}
     </View>
   );
 }
